@@ -1,0 +1,121 @@
+                    ISO= International Organization Of Standardization : Its a standard everyone has to follow when it comes to communication between network computers
+
+                    NOTE: ISO Develop OSI
+
+What we will be learning
+
+COMPONENTS
+OSI MODEL
+CLASSIFICATION
+DEVICE
+HOME NETWORK
+IP ADDRESS
+PROTOCCOLS
+DNS N DHCP
+NETWORK COMMANDS
+
+                   WHAT IS A COMPUTER NETORK
+Its a communication between two or more network computer interfaces 
+also used as a phase where more computer can exchange data
+
+
+                    COMPONENTS
+1. Two or more computer devices
+2. Cables as links between the computers
+3. A network interface card (NIC) on each computers
+4. Switches
+5. Router
+6. Software called operating system (OS)
+
+
+         HOW DO COMPUTERS COMMUNICATES ? 
+1. OSI MODEL = its like a common language everyone has to speak/every computer used to communicate
+OSI is the model of communication, STANDARD Develop by ISO
+
+2. It has 7 LAYERS Architecture developed in 1984
+
+3. VII.   APPLICATION           /   Network process to application    /     (data)
+                            ** Used to allow access to network resource
+
+   VI.    PRESENTATION          / data representation and Ecryption  /     (data)
+                            ** Used to translate, encrypt and compress data
+
+   V.     SESSION               / interhost communication     /     (data)
+                            ** Used to established, manage and terminate sessions
+
+
+   IV.    TRANSPORTATION        /  End to end connections and reliability      /   (segments)
+                            ** Used to provide reliable process-to-process message delivery and recovery
+
+   III.   NETWORK               /  path determination & logical Addressing(ip)   /   (Packets)
+                           ** Used to move packets from source to destination and to also provide
+                              internet working
+
+   II.    DATALINK              / physical addressing (MAC & LLC)   /   (Frames)
+                           ** Used to organize bits into frames to provide hop-to-hop delivery
+
+
+   I.     PHYSICAL              / Media Signal and binary Transmission   /      (Bits)
+                           ** Used to transmit bits over a medium to provide mechanical and electrical specification
+
+
+
+                           CLASSIFICATION OF NETWORK BY GEOGRAPHY
+
+LAN
+  Local area Network
+
+WAN
+  Wide area network
+
+MAN
+  Metropolitan are network
+
+CAN
+  Campus area network
+
+PAN
+  Personal Area Network
+
+
+
+
+                         SWITCHES
+    Switches facilitates the sharing of resources by connecting together all the devices, including computers, printers, servers, in a small business network.....
+
+                         ROUTERS
+    A router receives and sends data on computer networks, routers re sometimes confused with network hubs, moderns, or network switches, routers can combine multiple networks together.....
+
+
+                         PROTOCOLS
+    Protocol is the formal specification that defines the procedures that must be followed when transmitting or receiving data.. protocol defines the format, timing sequence and error checking used on the network......
+
+
+
+
+                TCP                                                UDP
+.Reliable protocol                                       .Unreliable protocol
+
+.connection oriented                                    .Connectionless
+
+.performs 3 ways handshake                              .Much faster than TCP
+
+.provission for error detection and retransmission      .No acknowledgement waits
+
+.Most application use TCP For reliable and guaranteed   .No proper sequencing of data units
+ transmission
+
+.FTP, HTTP, HTTPS                                     .Suitabel for applications where speed matters more 
+                                                        than reliability
+
+                                                        .DNS, DHCP, TFTP, ARP, RARP
+
+
+
+DNS       DOMAIN NAME SERVICE               UDP 53
+HTTP      WEB                               TCP 80
+HTTPS     SECURE WEB (SSL)                  TCP 443
+SMTP      SIMPLE MAIL TRANSPORT PROTOCOL    TCP 25
+POP       POST OFFICE PROTOCOL              TCP 109, 110
+SSH       SECURE SHELL(TERMINAL)            TCP 22
+FTP       FILE TRANSFER PROTOCOL            TCP 20, 21

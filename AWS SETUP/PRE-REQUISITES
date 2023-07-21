@@ -1,0 +1,21 @@
+AWS  ACCOUNT CREATION
+GIT/GITHUB
+DOCKER HUB
+DNS (GODADDY)
+ACM
+
+
+ACM
+        Request public certificate
+            Fully qualified Domain name = *.<domain-name.com>
+
+        Validation Method = DNS Validation
+
+        Tag key = Name,  Tag value = <domain-name.com>
+                          ===create
+
+Refresh to see the certificate... click on it to validate the ACM With GODADDY
+
+GODADDY --> Manage DNS --> ADD NEW RECORD
+
+TYPE = CNAME,  NAME = ACM (cname Name) note to take out the domain name at the end, Value = ACM (Value name) note to take out the . at the end save it.

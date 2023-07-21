@@ -1,0 +1,173 @@
+DATABASE-SETUP
+
+Login to the db vm 
+	Ø $ vagrant ssh db01
+	
+Verify Hosts entry, if entries missing update the it with IP and hostnames 
+	Ø # cat /etc/hosts
+
+Update OS with latest patches 
+	Ø # yum update -y
+	
+Set Repository 
+	Ø # yum install epel-release -y
+
+Install Maria DB Package 
+	Ø # yum install git mariadb-server -y
+
+Starting & enabling mariadb-server 
+	Ø # systemctl start mariadb 
+	Ø # systemctl enable mariadb
+
+RUN mysql secure installation script. 
+	Ø # mysql_secure_installation 
+	Ø Y Y N Y Y
+	
+NOTE: Set db root password, I will be using admin123 as password
+Set DB name and users.
+
+# mysql -u root -padmin123
+
+mysql> create database accounts;
+
+mysql> grant all privileges on accounts.* TO 'admin'@’%’ identified by 'admin123' ;
+
+mysql> FLUSH PRIVILEGES;
+
+mysql> exit;
+
+Download Source code & Initialize Database.
+# git clone -b main https://github.com/realtechie/MAIN-PROJECTZ.git
+
+# cd vprofile-project
+
+# mysql -u root -padmin123 accounts < src/main/resources/db_backup.sql
+
+# mysql -u root -padmin123 accounts
+
+mysql> show tables;
+
+Restart mariadb-server
+# systemctl restart mariadb
+Starting the firewall and allowing the mariadb to access from port no. 3306
+# systemctl start firewalld
+# systemctl enable firewalld
+# firewall-cmd --get-active-zones
+# firewall-cmd --zone=public --add-port=3306/tcp --permanent
+# firewall-cmd --reload
+# systemctl restart mariadb
+
+
+
+++++++++=============================================================+++++++++++++++
+
+                     MEMCACHE SETUP
+
+Install, start & enable memcache on port 11211
+# sudo dnf install epel-release -y
+# sudo dnf install memcached -y
+# sudo systemctl start memcached
+# sudo systemctl enable memcached
+# sudo systemctl status memcached
+# sed -i 's/127.0.0.1/0.0.0.0/g' /etc/sysconfig/memcached
+# sudo systemctl restart memcached
+Starting the firewall and allowing the port 11211 to access memcache
+# firewall-cmd --add-port=11211/tcp
+# firewall-cmd --runtime-to-permanent
+# firewall-cmd --add-port=11111/udp
+# firewall-cmd --runtime-to-permanent
+# sudo memcached -p 11211 -U 11111 -u memcached -d
+
+
++++++++++=============================================================+++++++++++++++
+
+                RABBIT-MQ
+
+    1  yum update -y
+    2  yum install wget -y
+    3  cd /tmp/
+    4  dnf -y install centos-release-rabbitmq-38
+    5  dnf --enablerepo=centos-rabbitmq-38 -y install rabbitmq-server
+    6  systemctl start rabbitmq-server
+    7  systemctl enable rabbitmq-server
+    8  sh -c 'echo "[{rabbit, [{loopback_users, []}]}]." > /etc/rabbitmq/rabbitmq.config'
+    9  rabbitmqctl add_user test test
+   10   rabbitmqctl set_user_tags test administrator
+   11  systemctl restart rabbitmq-server
+   12  systemctl status rabbitmq-server
+
+++++++++++===========================================================++++++++++++++++
+
+
+
+              CODE BUILD & DEPLOY (app01)
+
+Download Source code
+# git clone -b main https://github.com/realtechie/MAIN-PROJECTZ.git
+
+Update configuration
+# cd vprofile-project
+
+# vim src/main/resources/application.properties
+
+# Update file with backend server details
+Build code
+Run below command inside the repository (vprofile-project)
+# mvn install
+
+Deploy artifact
+# systemctl stop tomcat
+# rm -rf /usr/local/tomcat/webapps/ROOT*
+# cp target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
+# systemctl start tomcat
+# chown tomcat.tomcat usr/local/tomcat/webapps -R
+# systemctl restart tomcat
+
+
+    NGINX SETUP
+Login to the Nginx vm
+$ vagrant ssh web01
+
+Verify Hosts entry, if entries missing update the it with IP and hostnames
+# cat /etc/hosts
+
+Update OS with latest patches
+# apt update
+# apt upgrade
+
+Install nginx
+# apt install nginx -y
+
+Create Nginx conf file with below content
+# vi /etc/nginx/sites-available/vproapp
+
+upstream vproapp {
+  server app01:8080;
+}
+server {
+  listen 80;
+  location / {
+ proxy_pass http://vproapp;
+ }
+}
+Remove default nginx conf
+
+NOTE:
+(ls -l /etc/nginx/sites-enabled) it shows the default link
+
+# rm -rf /etc/nginx/sites-enabled/default
+
+(ls -l /etc/nginx/sites-enabled) it shows no link
+
+Create link to activate website
+# ln -s /etc/nginx/sites-available/vproapp /etc/nginx/sites-enabled/vproapp
+
+(ls -l /etc/nginx/sites-enabled) it shows the new link
+
+Restart Nginx
+# systemctl restart nginx
+
+
+from browser
+login = admin_vp
+password = admin_vp

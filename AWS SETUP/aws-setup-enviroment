@@ -1,0 +1,141 @@
+####### SECURITY GROUP SETUP #########
+
+NOTE: CREATE SECURITY GROUP
+                TYPE                  SOURCE              DISCRIPTION    DNS NAME
+1-  ELB SG --------
+         RULES - HTTP                  (80)             allow anywhere     web01
+                 HTTPS                 (443)            allow anywhere
+                
+
+2-  APP-SG 4 TOMCAT -------
+     RULES -    Custom TCP             (8080)          allow from ELB SG    app01
+
+3-  BACKEND SG -------
+                    
+     RULES -     Mysql/Aurora           (3306)          allow from APP-SG   db01
+                 MEMCACHE               (11211)         allow from APP-SG   mc01
+                 RABBITMQ               (5672)          allow from APP-SG   rmq01
+                 ALL TRAFFIC          From Backend SG   allows inter traffic
+
+NOTE: ALLOW SSH ON BOTH SECURITY GROUPS TO BE ABLE TO LOGIN THE EC2 INSTANCE
+
+https://github.com/realtechie/MAIN-PROJECTZ.git   Branch (aws-LiftAndShift)
+
+NOTE: WE ARE USING THE USER DATA TO DEPLOY OUR EC2 INSTANCES
+
+EC2 DEPLOYMENT
+                                 SECURITY GROUP (BACKEND SG)
+    1. DB INSTANCE AWS Marketplace AMI's (Centos stream 9(x86_64))
+    2. MEMCACHED INSTANCE AWS Marketplace AMI's (Centos stream 9(x86_64))
+    3. RABBIT-MQ INSTANCE AWS Marketplace AMI's (Centos stream 9(x86_64))
+
+                                 SECURITY GROUP (BACKEND SG)
+    4. APP INSTANCE INSTANCE AWS Marketplace AMI's (UBUNTU-22 stream 9(x86_64))
+            Login
+            switch to root
+            ss -tunlp | grep 11211
+
+
+            ROUTE53
+DNS SERVICE
+    Create hosted zone
+       Domain Name= (vprofile.in)
+       type = Private hosted Zone
+       Region = us-east-1
+       vpc = (ur vpc)
+              (create)
+
+    Create Record
+        Simple routing
+        Define simple records
+        Record Name = db01, mc01, rmq01, 
+        Record type = A - Route traffic to an ipv4 address and some AWS 
+        vallue/Route traffic to = private ip of DB SERVER
+
+    NOTE: Create records for all the servers
+    
+    From Gitbash,clone the code https://github.com/realtechie/MAIN-PROJECTZ.git  and in Branch (aws-LiftAndShift)
+    go to the source code directory to edit the properties file
+          src --> main --> resource --> application.properties
+               in line 3, add the Route 53 hosted zone name
+                   jdbc.url=jdbc:mysql://db01.vprofile.in:3306/accounts.....
+               in line 9, add the Route 53 hosted zone name
+                   memcached.active.host=mc01.vprofile.in
+               in line 16, add the Route 53 hosted zone name
+                   rabbitmq.address=rmq01.vprofile.in
+
+    save it and run mvn install
+
+    NOTE: You need to have Java11 and maven installed on the local machine(laptop)
+
+Setup a user and create its access keys and secrete access keys
+    need to install awscli
+    aws configure
+    #aws s3 mb s3://<bucket-unique-name>
+    #aws s3 cp target/vprofile-v2.war s3://<bucket-unique-name>
+
+
+NEED TO COPY THE ARTIFACTS FROM S3-BUCKET TO APP SERVER = app01 (tomcat)
+    Create a role 
+        EC2 - S3Fullaccess
+        Attach the role to Appserver to have access to S3-bucket
+        login to the server
+        switch to root
+        copy the artifacts from s3-bucket to /tmp directory in the server
+            #aws s3 cp s3://<bucket-unique-name> /tmp
+        stop Tomcat9
+            #systemctl stop tomcat9
+            rm -rf /var/lib/tomcat9/webapps/ROOT 
+
+        COPY the artifacts to tomcat
+            cp /tmp/vprofile-v2.war /var/lib/tomcat9/webapps/ROOT.war
+        
+        Start Tomcat9 SERVICE
+            #systemctl start tomcat9
+
+
+                       CREATING LOADBALANCER.....
+1. Create target group
+    ec2-instance
+    target group name = vprofile-app-TG
+    protocool = HTTP, Port = 8080
+    VPC = <Your-vpc>
+    Health check = /login
+       Advanced health check settings
+           port --> override --> 8080
+           healthy threshold = 3
+
+
+
+2. LOADBALANCER
+    ALB --> internet-facing
+    Add listener --> Port (80)  then add TG
+    Add listener --> Port (443)  then add TG
+
+    Default SSL/TLS CERT
+        FROM ACM
+
+        create loadbalancer 
+
+3.  GODADDY
+     manage DNS
+         ADD NEW RECORD 
+         TYPE = CNAME,  HOST = vprofileapp,  Point to = alb DNS
+                       save it  and test the Godaddy domain name
+        host.godaddydomain-name in browser...
+
+4.  AUTOSCALING GROUP
+         CREATE AMI Of the app01 server
+         CREATE lunch configuration
+         AUTOSCALING
+             
+
+
+
+    
+
+
+
+
+
+
