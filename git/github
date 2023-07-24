@@ -77,7 +77,9 @@ scenario 5: ignoring some files in a git repository permanently ( .gitignore )
 scenario 6: work with git tags
 
 	Tagging is used to capture a point in history that is used for a marked version release (i.e. v1.0.1), in other words git tags are simply aliases for commit ids. tags are always created against specific commit ids
-	
+
+        git tag -a v1.4 -m "v1.4" 175435d
+
 	git tag -- lists all available tags
 	git show v1.2 -- shows which commit id tagged, who commited & what is commited
 	
