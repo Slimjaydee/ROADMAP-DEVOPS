@@ -253,3 +253,6 @@ case 3: merge changes using -- git rebase
 		
 there are pros & cons using reabse -- we need to understand the situation before using & if neccessary use merge or rebase accordingly.
 ===================================================================================================================		
+
+#git rm filename  (remove files from git indexes)
+#git branch -a (shows all the branches)
